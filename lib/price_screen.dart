@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:bitcoin_ticker_app/coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   const PriceScreen({super.key});
@@ -8,6 +11,47 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
+  String? selectedCurrency = "USD";
+
+//Andriod dropdown
+  DropdownButton<String> andriodDropdown() {
+    return DropdownButton<String>(
+      value: selectedCurrency,
+      items: currenciesList.map((String currency) {
+        return DropdownMenuItem<String>(
+          value: currency,
+          child: Text(currency),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedCurrency = value!;
+        });
+        print(selectedCurrency);
+      },
+    );
+  }
+
+  // ios dropdown
+  CupertinoPicker iosPicker() {
+    return CupertinoPicker(
+      backgroundColor: Colors.transparent,
+      itemExtent: 32.0,
+      onSelectedItemChanged: (int selectedIndex) {},
+      children: currenciesList.map((String currency) {
+        return Text(currency);
+      }).toList(),
+    );
+  }
+
+  Widget getPicker() {
+    if (Platform.isIOS) {
+      return iosPicker();
+    } else {
+      return andriodDropdown();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,26 +88,11 @@ class _PriceScreenState extends State<PriceScreen> {
             alignment: Alignment.center,
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
-            child: null,
+            // child: getDropdownButton(),
+            child: getPicker(),
           ),
         ],
       ),
     );
-  }
-}
-
-
-
-class MyWidget extends StatefulWidget {
-  const MyWidget({super.key});
-
-  @override
-  State<MyWidget> createState() => _MyWidgetState();
-}
-
-class _MyWidgetState extends State<MyWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
   }
 }
