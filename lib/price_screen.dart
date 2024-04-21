@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:bitcoin_ticker_app/coin_data.dart';
+import 'package:bitcoin_ticker_app/services/price.dart';
 import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class PriceScreen extends StatefulWidget {
 class _PriceScreenState extends State<PriceScreen> {
   String? selectedCurrency = "USD";
 
-//Andriod dropdown
+  //Andriod dropdown
   DropdownButton<String> andriodDropdown() {
     return DropdownButton<String>(
       value: selectedCurrency,
@@ -44,12 +45,17 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 
-  Widget getPicker() {
-    if (Platform.isIOS) {
-      return iosPicker();
-    } else {
-      return andriodDropdown();
-    }
+  Future<dynamic> getCryptoTokenPrice() async {
+    PriceModel priceModel = PriceModel();
+    var priceData = await priceModel.getCryptoTokenPrice('BTC', 'USD');
+    print('priceData: $priceData');
+    return priceData;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getCryptoTokenPrice();
   }
 
   @override
@@ -89,7 +95,7 @@ class _PriceScreenState extends State<PriceScreen> {
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             // child: getDropdownButton(),
-            child: getPicker(),
+            child: Platform.isIOS ? iosPicker() : andriodDropdown(),
           ),
         ],
       ),
