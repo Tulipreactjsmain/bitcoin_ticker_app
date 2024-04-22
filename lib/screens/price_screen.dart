@@ -13,20 +13,23 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  getPrice() async {
-    coinPrice = await PriceModel().getPrice(setState);
+  String? currencyName;
+
+  getPrice(String currency) async {
+    coinPrice = await PriceModel().getPrice(setState, currency);
+    currencyName = currency;
     return coinPrice;
   }
 
   @override
   void initState() {
-    getPrice();
+    getPrice('USD');
     super.initState();
   }
 
   @override
   void dispose() {
-    timer.cancel();
+    timer?.cancel();
     super.dispose();
   }
 
@@ -56,7 +59,7 @@ class _PriceScreenState extends State<PriceScreen> {
                         EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                     child: Text(
                       coinPrice?[token] != null
-                          ? '1 $token = ${coinPrice?[token]}'
+                          ? '1 $token = ${coinPrice?[token]} $currencyName'
                           : 'Loading...',
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -75,12 +78,15 @@ class _PriceScreenState extends State<PriceScreen> {
             padding: const EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             child: Platform.isIOS
-                ? iosPicker()
+                ? iosPicker((index) {
+                    getPrice(currenciesList[index]);
+                    currencyName = currenciesList[index];
+                  })
                 : androidDropdown((value) {
                     setState(() {
-                      selectedCurrency = value!;
+                      currencyName = value!;
                     });
-                  }, selectedCurrency),
+                  }, currencyName),
           ),
         ],
       ),

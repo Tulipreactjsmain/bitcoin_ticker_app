@@ -6,8 +6,7 @@ import 'dart:async';
 final apiKey = dotenv.env['API_KEY'];
 String coinApiUrl = 'https://rest.coinapi.io/v1/exchangerate';
 Map<String, String>? coinPrice = {};
-late Timer timer;
-String selectedCurrency = "USD";
+Timer? timer;
 
 class PriceModel {
   Future<dynamic> getCryptoTokenPrice(
@@ -19,24 +18,27 @@ class PriceModel {
     return tokenData;
   }
 
-  Future<dynamic> getPrice(void Function(void Function()) setState) async {
+  Future<Map<String, String>?> getPrice(
+      void Function(void Function()) setState, String currencyName) async {
     Future<void> updatePrice() async {
       PriceModel priceModel = PriceModel();
       for (String token in cryptoList) {
         var priceData =
-            await priceModel.getCryptoTokenPrice(token, selectedCurrency);
-        double rawPrice = priceData['rate'];
-        String formattedPrice = rawPrice.toStringAsFixed(0);
-        setState(() {
-          coinPrice?[token] = formattedPrice;
-        });
-
+            await priceModel.getCryptoTokenPrice(token, currencyName);
+        if (priceData != null && priceData['rate'] != null) {
+          double rawPrice = priceData['rate'];
+          String formattedPrice = rawPrice.toStringAsFixed(0);
+          setState(() {
+            coinPrice?[token] = formattedPrice;
+            // print(coinPrice);
+          });
+        }
       }
     }
 
     await updatePrice();
 
-    timer = Timer.periodic(const Duration(seconds: 3), (Timer timer) async {
+    timer = Timer.periodic(const Duration(seconds: 5), (Timer timer) async {
       await updatePrice();
     });
 
