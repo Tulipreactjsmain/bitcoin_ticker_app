@@ -7,7 +7,3 @@ void debounce(Function() callback, Duration duration) {
   _debounce = Timer(duration, callback);
 }
 
-void onChangedCallback(int selectedIndex) {
-  debounce(() {
-  }, const Duration(milliseconds: 500));
-}

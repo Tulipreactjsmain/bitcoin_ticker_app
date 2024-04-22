@@ -21,15 +21,18 @@ DropdownButton<String> androidDropdown(
 }
 
 CupertinoPicker iosPicker(void Function(int) onChanged) {
+  final fixedExtentScrollController =
+      FixedExtentScrollController(initialItem: 19);
   return CupertinoPicker(
     backgroundColor: Colors.transparent,
-    itemExtent: 32.0,
+    itemExtent: 40.0,
+    scrollController: fixedExtentScrollController,
     onSelectedItemChanged: (int selectedIndex) {
-      onChanged(selectedIndex);
       debounce(() {
+        onChanged(selectedIndex);
         timer?.cancel();
         coinPrice?.clear();
-      }, const Duration(milliseconds: 500));
+      }, const Duration(milliseconds: 1000));
     },
     children: currenciesList.map((String currency) {
       return Text(currency);
